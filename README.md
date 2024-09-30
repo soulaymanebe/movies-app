@@ -6,6 +6,7 @@ A basic Python Flask app to stream movies using Flask.
 
 ### 1. Get OMDb API Key
 Visit [OMDb API](https://www.omdbapi.com/apikey.aspx) to get your free API key.
+Update 'Add_Your_OMDb_Token' with the token you received.
 
 ### 2. Install Python3 and Dependencies
 
