@@ -21,18 +21,16 @@ def index():
 
 @app.route('/watch/<imdb_id>')
 def watch(imdb_id):
-    # Determine the embed URL based on the type of the content (movie or series)
     details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
     details_response = requests.get(details_url).json()
     
     content_type = details_response.get('Type')
     movie_title = details_response.get('Title', 'Unknown Title')
     
-    # Generate embed URL based on content type
     if content_type == 'series':
-        embed_url = f'https://vidsrc.xyz/embed/series/{imdb_id}'
+        embed_url = f'https://vidsrc.xyz/embed/tv/{imdb_id}?ads=false'
     else:
-        embed_url = f'https://vidsrc.xyz/embed/movie/{imdb_id}'
+        embed_url = f'https://vidsrc.xyz/embed/movie/{imdb_id}?ads=false'
     
     return render_template('watch.html', embed_url=embed_url, movie_title=movie_title)
 
