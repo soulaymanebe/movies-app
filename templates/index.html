@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SB Movie Streaming App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="home-button">
+            <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
+        </a>        
+        <h1>Find Your Favorite Movies & Series</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="post" class="search-form">
+            <input type="text" name="movieName" placeholder="Enter movie or series name..." required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+</body>
+</html>
