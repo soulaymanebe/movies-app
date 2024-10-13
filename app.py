@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import requests
 
 app = Flask(__name__)
-OMDB_API_KEY = '835ed759'
+OMDB_API_KEY = 'OMDB-API-Token'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
