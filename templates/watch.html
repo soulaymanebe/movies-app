@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Watching {{ movie_title }}</title>
+    <title>Watching {{ title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -10,9 +10,13 @@
         <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
     </a>
     <div class="watch-container">
-        <h1>{{ movie_title }}</h1>
+        <h1>{{ title }}</h1>
         <div class="video-container">
             <iframe src="{{ embed_url }}" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="plot-container">
+            <h2>Story Line</h2>
+            <p>{{ plot | safe }}</p>
         </div>
     </div>
 </body>

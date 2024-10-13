@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Select a Movie or Series</title>
+    <title>Search results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -10,11 +10,11 @@
         <a href="{{ url_for('index') }}" class="home-button">
             <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
         </a>        
-        <h1>Select a Movie or Series</h1>
+        <h1>Search results</h1>
         <div class="results-grid">
             {% for result in results %}
                 <div class="result-card">
-                    <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='placeholder.png') }}" alt="Poster of {{ result['Title'] }}">
+                    <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
                     <div class="result-info">
                         <h2><a href="{{ url_for('watch', imdb_id=result['imdbID']) }}">{{ result['Title'] }}</a></h2>
                         <p>{{ result['Type'] | capitalize }} | {{ result['Year'] }}</p>
@@ -22,7 +22,6 @@
                 </div>
             {% endfor %}
         </div>
-        <a href="{{ url_for('index') }}" class="back-link">Back to Search</a>
     </div>
 </body>
 </html>

@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SB Movie Streaming App</title>
+    <title>Tmenyik</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
         <a href="{{ url_for('index') }}" class="home-button">
             <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
-        </a>        
+        </a>
+        <h2>Tmenyik</h2>
         <h1>Find Your Favorite Movies & Series</h1>
         {% if error %}
             <p class="error">{{ error }}</p>

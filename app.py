@@ -24,15 +24,19 @@ def watch(imdb_id):
     details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
     details_response = requests.get(details_url).json()
     
-    content_type = details_response.get('Type')
-    movie_title = details_response.get('Title', 'Unknown Title')
-    
-    if content_type == 'series':
+    print(details_response)
+
+    type    = details_response.get('Type', "N/A")
+    title           = details_response.get('Title', "N/A")
+    plot            = details_response.get('Plot', "N/A")
+    plot            = '<br>'.join(plot[i:i + 223] for i in range(0, len(plot), 225))
+
+    if type == 'series':
         embed_url = f'https://vidsrc.xyz/embed/tv/{imdb_id}?ads=false'
     else:
         embed_url = f'https://vidsrc.xyz/embed/movie/{imdb_id}?ads=false'
     
-    return render_template('watch.html', embed_url=embed_url, movie_title=movie_title)
+    return render_template('watch.html', embed_url=embed_url, title=title, plot=plot)
 
 if __name__ == '__main__':
     app.run(debug=True)

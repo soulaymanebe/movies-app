@@ -19,11 +19,52 @@ body {
 }
 
 h1 {
-    margin-bottom: 20px;
+    font-size: 30px;
     color: #ff6347;
 }
 
-.search-form input[type="text"], 
+h2 {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    color: #ff6347;
+}
+
+/* Error */
+.error {
+    color: #ff6347;
+}
+
+/* Home button */
+.home-button {
+    display: inline-block;
+    margin: 10px 0;
+    color: #ff6347; /* Change to your preferred color */
+    font-size: 24px; /* Adjust size as needed */
+    text-decoration: none;
+}
+
+.home-button i {
+    vertical-align: middle;
+}
+
+.home-button {
+    display: inline-block;
+    margin: 10px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.home-button img {
+    width: 30px;
+    height: auto;
+}
+
+/* Search */
+.search-form input[type="text"],
 .search-form button {
     padding: 10px;
     font-size: 16px;
@@ -41,6 +82,7 @@ h1 {
     cursor: pointer;
 }
 
+/* Results */
 .results-grid {
     display: flex;
     flex-wrap: wrap;
@@ -74,11 +116,12 @@ h1 {
     color: #bbb;
 }
 
+/* Movie/Serie video player container */
 .video-container {
     position: relative;
     padding-bottom: 56.25%;
     height: 0;
-    width: 60vw;
+    /* width: 55vw; */
     /* max-width: 60%; */
     /* margin: 0; */
     overflow: hidden;
@@ -94,40 +137,18 @@ h1 {
     border: none;
 }
 
-.error {
-    color: #ff6347;
-}
-
-.home-button {
-    display: inline-block;
-    margin: 10px 0;
-    color: #ff6347; /* Change to your preferred color */
-    font-size: 24px; /* Adjust size as needed */
-    text-decoration: none;
-}
-
-.home-button i {
-    vertical-align: middle;
-}
-
-.home-button {
-    display: inline-block;
-    margin: 10px;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-.home-button img {
-    width: 30px; /* Adjust the size as needed */
-    height: auto;
-}
-
-.back-link {
-    display: inline-block;
+/* Story Line */
+.plot-container {
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    padding: 10px;
     margin-top: 15px;
+    color: #fff;
+    text-align: left;
+}
+
+.plot-container h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
     color: #ff6347;
-    text-decoration: none;
-    font-size: 16px;
-    margin-right: 10px; /* Space between links */
 }
