@@ -18,12 +18,12 @@ body {
     margin: 0 auto;
 }
 
-h1 {
+.title h1 {
     font-size: 30px;
     color: #ff6347;
 }
 
-h2 {
+.title h2 {
     position: absolute;
     top: 0;
     left: 50%;
@@ -107,8 +107,16 @@ h2 {
 
 .result-card h2 {
     font-size: 18px;
-    margin: 10px 0;
     color: #ff6347;
+}
+
+.result-card h2 a {
+    text-decoration: none;
+    color: #ff6347;
+}
+
+.result-card h2 a:hover {
+    text-decoration: underline;
 }
 
 .result-info p {

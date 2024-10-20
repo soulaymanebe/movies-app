@@ -10,8 +10,10 @@
         <a href="{{ url_for('index') }}" class="home-button">
             <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
         </a>
-        <h2>Tmenyik</h2>
-        <h1>Find Your Favorite Movies & Series</h1>
+        <div class="title">
+            <h2>Tmenyik</h2>
+            <h1>Find Your Favorite Movies & Series</h1>
+        </div>
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
