@@ -13,7 +13,14 @@ def index():
 
         if search_response.get('Response') == 'True':
             results = search_response.get('Search', [])
-            return render_template('select.html', results=results)
+            detailed_results = []
+
+            for result in results:
+                details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={result["imdbID"]}'
+                details_response = requests.get(details_url).json()
+                detailed_results.append(details_response)
+
+            return render_template('select.html', results=detailed_results)
         else:
             error = search_response.get('Error', 'No results found.')
             return render_template('index.html', error=error)
@@ -23,8 +30,6 @@ def index():
 def watch(imdb_id):
     details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
     details_response = requests.get(details_url).json()
-    
-    print(details_response)
 
     type    = details_response.get('Type', "N/A")
     title           = details_response.get('Title', "N/A")

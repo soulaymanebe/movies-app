@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search results</title>
+    <title>Search Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -11,7 +11,7 @@
             <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
         </a>
         <div class="title">
-            <h2>Search results</h2>
+            <h2>Search Results</h2>
         </div>
         <div class="results-grid">
             {% for result in results %}
@@ -19,7 +19,13 @@
                     <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
                     <div class="result-info">
                         <h2><a href="{{ url_for('watch', imdb_id=result['imdbID']) }}">{{ result['Title'] }}</a></h2>
-                        <p>{{ result['Type'] | capitalize }} | {{ result['Year'] }}</p>
+                        <p>{{ result['Type'] | replace('series', 'Serie') | capitalize | default('N/A') }} | {{ result['Year'] | default('N/A') }}</p>
+                        <p><strong>Rating:</strong> {{ result['imdbRating'] | default('N/A') }}</p>
+                        {% if result['Type'] == 'series' %}
+                            <p><strong>Seasons:</strong> {{ result['totalSeasons'] | default('N/A') }}</p>
+                        {% else %}
+                            <p><strong>Length:</strong> {{ result['Runtime'] | default('N/A') }}</p>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

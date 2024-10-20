@@ -41,8 +41,8 @@ body {
 .home-button {
     display: inline-block;
     margin: 10px 0;
-    color: #ff6347; /* Change to your preferred color */
-    font-size: 24px; /* Adjust size as needed */
+    color: #ff6347;
+    font-size: 24px;
     text-decoration: none;
 }
 
@@ -88,6 +88,7 @@ body {
     flex-wrap: wrap;
     gap: 15px;
     justify-content: center;
+    margin-top: 40px;
 }
 
 .result-card {
@@ -97,6 +98,7 @@ body {
     width: 180px;
     text-align: center;
     color: #fff;
+    margin-top: 40px;
 }
 
 .result-card img {
@@ -127,13 +129,11 @@ body {
 /* Movie/Serie video player container */
 .video-container {
     position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    /* width: 55vw; */
-    /* max-width: 60%; */
-    /* margin: 0; */
-    overflow: hidden;
+    width: 1200px;
+    height: 675px;
+    margin: 0 auto;
     background-color: #000;
+    margin-top: 40px;
 }
 
 .video-container iframe {
@@ -153,10 +153,12 @@ body {
     margin-top: 15px;
     color: #fff;
     text-align: left;
+    margin-top: 20px;
 }
 
 .plot-container h2 {
     font-size: 20px;
     margin-bottom: 10px;
     color: #ff6347;
+    margin-top: 20px;
 }
