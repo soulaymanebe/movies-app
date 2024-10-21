@@ -95,7 +95,7 @@ body {
     background-color: #2d2d2d;
     padding: 10px;
     border-radius: 8px;
-    width: 180px;
+    width: 200px;
     text-align: center;
     color: #fff;
     margin-top: 40px;
@@ -103,12 +103,12 @@ body {
 
 .result-card img {
     width: 100%;
-    height: auto;
+    height: 300px;
     border-radius: 5px;
 }
 
 .result-card h2 {
-    font-size: 18px;
+    font-size: 20px;
     color: #ff6347;
 }
 
