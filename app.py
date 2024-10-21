@@ -32,9 +32,9 @@ def watch(imdb_id):
     details_response = requests.get(details_url).json()
 
     type    = details_response.get('Type', "N/A")
-    title           = details_response.get('Title', "N/A")
-    plot            = details_response.get('Plot', "N/A")
-    plot            = '<br>'.join(plot[i:i + 223] for i in range(0, len(plot), 225))
+    title   = details_response.get('Title', "N/A")
+    plot    = details_response.get('Plot', "N/A")
+    plot    = '<br>'.join(plot[i:i + 223] for i in range(0, len(plot), 225))
 
     if type == 'series':
         embed_url = f'https://vidsrc.xyz/embed/tv/{imdb_id}?ads=false'

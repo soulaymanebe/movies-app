@@ -15,10 +15,10 @@
         </div>
         <div class="results-grid">
             {% for result in results %}
-                <div class="result-card">
+                <a href="{{ url_for('watch', imdb_id=result['imdbID']) }}" class="result-card">
                     <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
                     <div class="result-info">
-                        <h2><a href="{{ url_for('watch', imdb_id=result['imdbID']) }}">{{ result['Title'] }}</a></h2>
+                        <h2>{{ result['Title'] }}</h2>
                         <p>{{ result['Type'] | replace('series', 'Serie') | capitalize | default('N/A') }} | {{ result['Year'] | default('N/A') }}</p>
                         <p><strong>Rating:</strong> {{ result['imdbRating'] | default('N/A') }}</p>
                         {% if result['Type'] == 'series' %}
@@ -27,7 +27,7 @@
                             <p><strong>Length:</strong> {{ result['Runtime'] | default('N/A') }}</p>
                         {% endif %}
                     </div>
-                </div>
+                </a>
             {% endfor %}
         </div>
     </div>

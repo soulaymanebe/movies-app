@@ -99,6 +99,9 @@ body {
     text-align: center;
     color: #fff;
     margin-top: 40px;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    display: block;
 }
 
 .result-card img {
@@ -110,15 +113,17 @@ body {
 .result-card h2 {
     font-size: 20px;
     color: #ff6347;
+    margin-top: 10px;
 }
 
-.result-card h2 a {
-    text-decoration: none;
-    color: #ff6347;
+.result-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.result-card h2 a:hover {
-    text-decoration: underline;
+.result-info p {
+    font-size: 14px;
+    color: #bbb;
 }
 
 .result-info p {
