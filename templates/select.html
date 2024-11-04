@@ -15,7 +15,7 @@
         </div>
         <div class="results-grid">
             {% for result in results %}
-                <a href="{{ url_for('watch', imdb_id=result['imdbID']) }}" class="result-card">
+                <a href="{{ url_for('watch', title=result['Title']|replace(' ', '-')) }}" class="result-card">
                     <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
                     <div class="result-info">
                         <h2>{{ result['Title'] }}</h2>

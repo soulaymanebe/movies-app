@@ -26,11 +26,12 @@ def index():
             return render_template('index.html', error=error)
     return render_template('index.html')
 
-@app.route('/watch/<imdb_id>')
-def watch(imdb_id):
-    details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
+@app.route('/watch/<title>')
+def watch(title):
+    details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&t={title}'
     details_response = requests.get(details_url).json()
 
+    imdb_id = details_response.get('imdbID')
     type    = details_response.get('Type', "N/A")
     title   = details_response.get('Title', "N/A")
     plot    = details_response.get('Plot', "N/A")
