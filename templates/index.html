@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <title>Tmenyik</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
+    <script>
+        function searchMovie(event) {
+            event.preventDefault();
+            const movieName = document.querySelector('input[name="movieName"]').value;
+            const searchRequest = movieName.replace(/ /g, "-");
+            window.location.href = `/results/${searchRequest}`;
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <a href="{{ url_for('index') }}" class="home-button">
-            <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
+            <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="Home" />
         </a>
         <div class="title">
             <h2>Tmenyik</h2>
@@ -17,7 +26,7 @@
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
-        <form method="post" class="search-form">
+        <form class="search-form" onsubmit="searchMovie(event)">
             <input type="text" name="movieName" placeholder="Enter movie or series name..." required>
             <button type="submit">Search</button>
         </form>

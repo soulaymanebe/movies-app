@@ -4,19 +4,25 @@
     <meta charset="UTF-8">
     <title>Search Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
 </head>
 <body>
     <div class="container">
         <a href="{{ url_for('index') }}" class="home-button">
-            <img src="{{ url_for('static', filename='home-icon.png') }}" alt="Home" />
+            <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="Home" />
         </a>
         <div class="title">
-            <h2>Search Results</h2>
+            <h2>Results for {{ search_request|replace('-', ' ')|capitalize }}</h2>
         </div>
         <div class="results-grid">
             {% for result in results %}
-                <a href="{{ url_for('watch', title=result['Title']|replace(' ', '-')) }}" class="result-card">
-                    <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
+                {% if result['Type'] == 'series' %}
+                    {% set watch_url = url_for('watch', title=result['Title']|replace(' ', '-')|replace(':-', ':'), season=1, episode=1) %}
+                {% else %}
+                    {% set watch_url = url_for('watch', title=result['Title']|replace(' ', '-')|replace(':-', ':')) %}
+                {% endif %}
+                <a href="{{ watch_url }}" class="result-card">
+                    <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='images/black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
                     <div class="result-info">
                         <h2>{{ result['Title'] }}</h2>
                         <p>{{ result['Type'] | replace('series', 'Serie') | capitalize | default('N/A') }} | {{ result['Year'] | default('N/A') }}</p>

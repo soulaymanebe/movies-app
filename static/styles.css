@@ -66,20 +66,30 @@ body {
 /* Search */
 .search-form input[type="text"],
 .search-form button {
+    border-radius: 5px;
+    color: #444;
     padding: 10px;
     font-size: 16px;
+    border: none;
     margin: 10px;
 }
 
 .search-form input[type="text"] {
+    background-color: #444;
+    color: #fff;
+    border: none;
     width: 50%;
 }
 
 .search-form button {
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
     background-color: #ff6347;
     color: #fff;
     border: none;
     cursor: pointer;
+    margin: 10px;
 }
 
 /* Results */
@@ -166,4 +176,115 @@ body {
     margin-bottom: 10px;
     color: #ff6347;
     margin-top: 20px;
+}
+
+/* Watching page */
+.parent-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.left-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* All episodes & seasons */
+.seasons-container {
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    padding: 20px;
+    color: #fff;
+    text-align: left;
+    width: 200px;
+    margin-top: 20px;
+}
+
+.seasons-container h2 {
+    text-align: center;
+    font-size: 20px;
+    color: #ff6347;
+}
+
+/* Season button styling */
+.season-button {
+    display: block;
+    padding: 8px;
+    background-color: #ff6347;
+    /* color: #ff6347; */
+    border-radius: 5px;
+    text-align: left;
+    font-weight: bold;
+    margin: 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.season-button:hover {
+    background-color: #3a3a3a;
+}
+
+/* Error container */
+.error-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 40px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Title styling */
+.error-title {
+    font-size: 160px;
+    color: #ff6347;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+/* Message styling */
+.error-message {
+    font-size: 18px;
+    color: #bbb;
+    margin-bottom: 35px;
+}
+
+/* Emoji styling with bounce */
+.error-emoji {
+    font-size: 150px;
+    animation: bounce 1.5s ease-in-out infinite, emojiHover 0.3s ease-in-out;
+    margin-top: 20px;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Bounce animation for emoji */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Hover effect for emoji */
+@keyframes emojiHover {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.error-emoji:hover {
+    animation: emojiHover 0.5s infinite ease-in-out;
+    transform: scale(1.2);
 }
