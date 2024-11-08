@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 
 ```bash
-python app.py
+python or python3 app.py
 ```
 
 Access the app at `http://127.0.0.1:5000`
