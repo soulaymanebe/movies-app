@@ -26,25 +26,25 @@ Before you get started, ensure you have the following:
 2. **Install dependencies**:
     Install the required Python libraries
 
-   ```bash
+    ```bash
     pip install -r requirements.txt
     ```
 
 3. **Prepare the `.env` file**:
     Create a .env file in the root directory and add your OMDB API key
 
-   ```env
+    ```env
     OMDB_API_KEY='your_omdb_api_key'
-
     ```
 
+---
+
 ### 🚀 **Run the Application**
+
     Once you've set up everything, you can launch the app by running
 
     ```bash
     python/python3 app.py
     ```
 
-The app will be available at:
-
-`🌐 http://127.0.0.1:5000`
+### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
