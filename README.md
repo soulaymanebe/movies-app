@@ -16,7 +16,7 @@ Before you get started, ensure you have the following:
 ### ⚙️ **Setup**
 
 1. **Clone the repository**:
-   First, clone the repository to your local machine:
+   First, clone the repository to your local machine
 
    ```bash
    git clone https://github.com/soulaymanebe/movies-app
@@ -24,23 +24,27 @@ Before you get started, ensure you have the following:
     ```
 
 2. **Install dependencies**:
-    Install the required Python libraries with
+    Install the required Python libraries
 
    ```bash
     pip install -r requirements.txt
     ```
 
 3. **Prepare the `.env` file**:
-   ```bash
+    Create a .env file in the root directory and add your OMDB API key
+
+   ```env
     OMDB_API_KEY='your_omdb_api_key'
+
     ```
 
 ### 🚀 **Run the Application**
-   ```bash
-    python app.py
+    Once you've set up everything, you can launch the app by running
+
+    ```bash
+    python/python3 app.py
     ```
 
 The app will be available at:
 
 `🌐 http://127.0.0.1:5000`
-
