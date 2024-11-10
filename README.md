@@ -8,7 +8,7 @@ Welcome to **Movie Streamer** – a simple Python Flask app that allows you to s
 
 Before you get started, ensure you have the following:
 
-- 🐍 **Python** installed (version 3.6 or higher).
+- 🐍 **Python** installed (version 3.8 or higher).
 - 🎥 **OMDB API token**: Sign up for an API key at [OMDb API](https://www.omdbapi.com/apikey.aspx).
 
 ---
@@ -16,7 +16,6 @@ Before you get started, ensure you have the following:
 ### ⚙️ **Setup**
 
 1. **Clone the repository**:
-   First, clone the repository to your local machine
 
    ```bash
    git clone https://github.com/soulaymanebe/movies-app
@@ -24,7 +23,6 @@ Before you get started, ensure you have the following:
     ```
 
 2. **Install dependencies**:
-    Install the required Python libraries
 
     ```bash
     pip install -r requirements.txt
@@ -41,7 +39,7 @@ Before you get started, ensure you have the following:
 
 ### 🚀 **Run the Application**
 
-    Once you've set up everything, you can launch the app by running
+**Once you've set up everything, you can launch the app by running**
 
     ```bash
     python/python3 app.py
