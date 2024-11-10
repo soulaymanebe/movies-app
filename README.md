@@ -41,8 +41,8 @@ Before you get started, ensure you have the following:
 
 **Once you've set up everything, you can launch the app by running**
 
-    ```bash
-    python/python3 app.py
-    ```
+```bash
+python/python3 app.py
+```
 
 ### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
