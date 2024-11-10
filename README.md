@@ -1,26 +1,46 @@
-# 🎬 Movie Streamer
+# 🎬 **Movie Streamer** 
 
-A basic Python Flask app to stream movies using Flask.
+Welcome to **Movie Streamer** – a simple Python Flask app that allows you to stream your favorite movies effortlessly!
 
-### Prerequisites
+---
 
-Before you begin, ensure you have the following:
+### 📋 **Prerequisites**
 
-- Python installed.
-- OMDB API toke. Visit [OMDb API](https://www.omdbapi.com/apikey.aspx)
+Before you get started, ensure you have the following:
 
-### Setup
+- 🐍 **Python** installed (version 3.6 or higher).
+- 🎥 **OMDB API token**: Sign up for an API key at [OMDb API](https://www.omdbapi.com/apikey.aspx).
 
-Clone this repo and install dependencies:
+---
 
-```bash
-git clone https://github.com/soulaymanebe/movies-app
-cd movie-streamer
-pip install -r requirements.txt
-```
+### ⚙️ **Setup**
 
-```bash
-python app.py
-```
+1. **Clone the repository**:
+   First, clone the repository to your local machine:
 
-Access the app at `http://127.0.0.1:5000`
+   ```bash
+   git clone https://github.com/soulaymanebe/movies-app
+   cd movie-streamer
+    ```
+
+2. **Install dependencies**:
+    Install the required Python libraries with
+
+   ```bash
+    pip install -r requirements.txt
+    ```
+
+3. **Prepare the `.env` file**:
+   ```bash
+    OMDB_API_KEY='your_omdb_api_key'
+    ```
+
+### 🚀 **Run the Application**
+   ```bash
+    python app.py
+    ```
+
+The app will be available at:
+
+`🌐 http://127.0.0.1:5000`
+

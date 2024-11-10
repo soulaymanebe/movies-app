@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for
-import requests
+from flask import Flask, render_template, request
+import requests, os
 from flask_caching import Cache
+from dotenv import load_dotenv
 
+# Prepare app env
+load_dotenv()
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
-OMDB_API_KEY = 'OMDB-API-Token'
+OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 
 # Main endpoint
 @app.route('/', methods=['GET'])
@@ -17,7 +20,7 @@ def index():
 def results(search_request):
     error_message = None
     results = []
-    
+
     try:
         search_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={search_request}'
         search_response = requests.get(search_url)
@@ -35,6 +38,7 @@ def results(search_request):
                 detailed_results.append(details_response.json())
 
             return render_template('select.html', results=detailed_results, search_request=search_request)
+
         else:
             error_message = search_data.get('Error', 'No results found.')
 
