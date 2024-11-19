@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-import requests, os, re
+import requests, os, re, unicodedata
 from flask_caching import Cache
 from dotenv import load_dotenv
 
@@ -12,7 +12,10 @@ OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 # Custom filter to clean special characters
 @app.template_filter('slugify')
 def slugify(value):
-    return re.sub(r'[^a-zA-Z0-9]+', '-', value).strip('-')
+    value = unicodedata.normalize('NFD', value)
+    value = value.encode('ascii', 'ignore').decode('utf-8')
+    value = re.sub(r'[^a-zA-Z0-9]+', '-', value)
+    return value.strip('-')
 
 # Main endpoint
 @app.route('/', methods=['GET'])
