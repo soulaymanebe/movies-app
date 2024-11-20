@@ -44,15 +44,28 @@ def results(search_request):
             results = tmdb_data['results']
             detailed_results = []
 
-            # Fetch detailed movie info from OMDb using the corrected TMDb titles
+            # Remove duplicates based on IMDb ID
+            seen_imdb_ids = set()
+            unique_results = []
+
             for result in results:
+                # Get the movie title from TMDb
                 movie_title = result['title']
+
+                # Use OMDb API to fetch movie details based on the title
                 omdb_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&t={movie_title}'
                 omdb_response = requests.get(omdb_url)
                 omdb_response.raise_for_status()
-                detailed_results.append(omdb_response.json())
+                omdb_data = omdb_response.json()
 
-            return render_template('select.html', results=detailed_results, search_request=search_request)
+                # Check for unique IMDb ID to avoid duplicates
+                imdb_id = omdb_data.get("imdbID")
+                if imdb_id not in seen_imdb_ids:
+                    seen_imdb_ids.add(imdb_id)
+                    unique_results.append(omdb_data)
+
+            # Pass the unique results to the template
+            return render_template('select.html', results=unique_results, search_request=search_request)
 
         else:
             error_message = "No results found. Please try a different search."
