@@ -42,7 +42,6 @@ def results(search_request):
 
         if tmdb_data.get('results'):
             results = tmdb_data['results']
-            detailed_results = []
 
             # Remove duplicates based on IMDb ID
             seen_imdb_ids = set()
@@ -76,12 +75,12 @@ def results(search_request):
     return render_template('index.html', error=error_message)
 
 # Watch endpoint
-@cache.cached(timeout=300, query_string=True)
-@app.route('/watch/<title>')
-def watch(title):
-    title = title.replace('-', ' ')
-    omdb_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&t={title}'
-    
+@app.route('/watch/<selected_result>')
+def watch(selected_result):
+    # Get title from the query parameters
+    imdb_id = request.args.get('id')
+    omdb_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
+
     try:
         omdb_response = requests.get(omdb_url)
         omdb_response.raise_for_status()
@@ -89,12 +88,12 @@ def watch(title):
     except requests.exceptions.RequestException as e:
         return render_template('watch.html', error_message=str(e))
 
-    imdb_id = details_data.get('imdbID')
     movie_type = details_data.get('Type', "N/A")
     movie_title = details_data.get('Title', "N/A")
     plot = details_data.get('Plot', "N/A")
     plot = '<br>'.join(plot[i:i + 223] for i in range(0, len(plot), 225))
 
+    # Get season and episode from query parameters (if available)
     season = int(request.args.get('season', 1))
     episode = int(request.args.get('episode', 1))
 
@@ -103,13 +102,7 @@ def watch(title):
     else:
         embed_url = f'https://vidsrc.xyz/embed/movie/{imdb_id}?ads=false'
 
-    return render_template(
-        'watch.html',
-        embed_url=embed_url,
-        title=movie_title,
-        plot=plot,
-        type=movie_type
-    )
+    return render_template('watch.html', embed_url=embed_url, title=movie_title, plot=plot, type=movie_type)
 
 # 404 Error Handler
 @app.errorhandler(404)

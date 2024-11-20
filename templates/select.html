@@ -16,10 +16,13 @@
         </div>
         <div class="results-grid">
             {% for result in results %}
+                {% set imdb_id = result['imdbID'] %}
+                {% set title = result['Title']|slugify %}        
+                
                 {% if result['Type'] == 'series' %}
-                    {% set watch_url = url_for('watch', title=result['Title']|slugify, season=1, episode=1) %}
+                    {% set watch_url = url_for('watch', selected_result=title, id=imdb_id, season=1, episode=1) %}
                 {% else %}
-                    {% set watch_url = url_for('watch', title=result['Title']|slugify) %}
+                    {% set watch_url = url_for('watch', selected_result=title, id=imdb_id) %}
                 {% endif %}
                 <a href="{{ watch_url }}" class="result-card">
                     <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='images/black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
