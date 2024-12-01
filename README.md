@@ -39,12 +39,7 @@ Before you get started, ensure you have the following:
 **Once you've set up everything, you can launch the app by running**
 
 ```bash
-<<<<<<< HEAD
 python app.py
-=======
-python3 app.py
-# If not working, try using 'python' instead of 'python3'
->>>>>>> d207aedde9f869ac6da5579bf461f901bcaa1672
 ```
 
 ### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
