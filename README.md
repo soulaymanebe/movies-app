@@ -8,7 +8,7 @@ Welcome to **Movie Streamer** – a simple Python Flask app that allows you to s
 
 Before you get started, ensure you have the following:
 
-- 🐍 **Python** installed (version 3.8 or higher).
+- 🐍 **Python** installed.
 - 🎥 **OMDB API token**: Sign up for an API key at [OMDb API](https://www.omdbapi.com/apikey.aspx).
 - 🎥 **TMDB API token**: Sign up for an API key at [TMDb API](https://www.themoviedb.org/settings/api).
 
@@ -39,7 +39,12 @@ Before you get started, ensure you have the following:
 **Once you've set up everything, you can launch the app by running**
 
 ```bash
+<<<<<<< HEAD
 python app.py
+=======
+python3 app.py
+# If not working, try using 'python' instead of 'python3'
+>>>>>>> d207aedde9f869ac6da5579bf461f901bcaa1672
 ```
 
 ### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
