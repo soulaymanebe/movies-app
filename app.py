@@ -8,6 +8,8 @@ load_dotenv()
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
 
 # Custom filter to clean special characters
 @app.template_filter('slugify')
@@ -17,6 +19,23 @@ def slugify(value):
     value = re.sub(r'[^a-zA-Z0-9]+', '-', value)
     return value.strip('-')
 
+# Function to Search TMDB
+def search_tmdb_for_suggestions(search_request):
+    tmdb_url = f'https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={search_request}'
+    try:
+        response = requests.get(tmdb_url)
+        response.raise_for_status()
+        tmdb_data = response.json()
+
+        if tmdb_data.get('results'):
+            # Extract movie titles from the TMDB results
+            return [movie['title'] for movie in tmdb_data['results']]
+        else:
+            return []
+    except requests.exceptions.RequestException as e:
+        print(f"Error querying TMDB: {e}")
+        return []
+
 # Main endpoint
 @app.route('/', methods=['GET'])
 def index():
@@ -25,11 +44,12 @@ def index():
 # Results endpoint with caching
 @cache.cached(timeout=300, query_string=True)
 @app.route('/results/<search_request>')
-def results(search_request):
+def results(search_request):    
     error_message = None
     results = []
 
     try:
+        # Search OMDB first
         search_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={search_request}'
         search_response = requests.get(search_url)
         search_response.raise_for_status()
@@ -48,7 +68,31 @@ def results(search_request):
             return render_template('select.html', results=detailed_results, search_request=search_request)
 
         else:
-            error_message = search_data.get('Error', 'No results found.')
+            # Fallback to TMDB for suggestions
+            tmdb_suggestions = search_tmdb_for_suggestions(search_request)
+            print(tmdb_suggestions)
+
+            if tmdb_suggestions:
+                # Use the first suggestion to query OMDB again
+                corrected_search = tmdb_suggestions[0]
+                corrected_search_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={corrected_search}'
+                corrected_search_response = requests.get(corrected_search_url)
+                corrected_search_response.raise_for_status()
+                corrected_search_data = corrected_search_response.json()
+
+                if corrected_search_data.get('Response') == 'True':
+                    results = corrected_search_data.get('Search', [])
+                    detailed_results = []
+
+                    for result in results:
+                        details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={result["imdbID"]}'
+                        details_response = requests.get(details_url)
+                        details_response.raise_for_status()
+                        detailed_results.append(details_response.json())
+
+                    return render_template('select.html', results=detailed_results, search_request=corrected_search)
+
+            error_message = search_data.get('Error', 'No results found. Try searching with different keywords.')
 
     except requests.exceptions.RequestException as e:
         error_message = str(e)
