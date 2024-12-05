@@ -10,7 +10,6 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
-
 # Custom filter to clean special characters
 @app.template_filter('slugify')
 def slugify(value):

@@ -6,10 +6,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
     <script>
+        function slugify(value) {
+            value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            value = value.replace(/[^a-zA-Z0-9]+/g, '-');
+            return value.replace(/^-+|-+$/g, '');
+        }
+        
         function searchMovie(event) {
             event.preventDefault();
             const movieName = document.querySelector('input[name="movieName"]').value;
-            const searchRequest = movieName.replace(/ /g, "-");
+            const searchRequest = slugify(movieName);
             window.location.href = `/results/${searchRequest}`;
         }
     </script>
