@@ -144,11 +144,11 @@ body {
 /* Movie/Serie video player container */
 .video-container {
     position: relative;
-    width: 1200px;
-    height: 675px;
+    width: 1024px;
+    height: 600px;
     margin: 0 auto;
     background-color: #000;
-    margin-top: 40px;
+    margin-top: 50px;
 }
 
 .video-container iframe {

@@ -28,7 +28,6 @@ def search_tmdb_for_suggestions(search_request):
         tmdb_data = response.json()
 
         if tmdb_data.get('results'):
-            # Extract movie titles from the TMDB results
             return [movie['title'] for movie in tmdb_data['results']]
         else:
             return []
@@ -70,7 +69,6 @@ def results(search_request):
         else:
             # Fallback to TMDB for suggestions
             tmdb_suggestions = search_tmdb_for_suggestions(search_request)
-            print(tmdb_suggestions)
 
             if tmdb_suggestions:
                 # Use the first suggestion to query OMDB again
