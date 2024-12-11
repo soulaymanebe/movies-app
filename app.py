@@ -3,14 +3,14 @@ import requests, os, re, unicodedata
 from flask_caching import Cache
 from dotenv import load_dotenv
 
-# Prepare app env
+# Prepare env
 load_dotenv()
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
-# Custom filter to clean special characters
+# Clean special characters
 @app.template_filter('slugify')
 def slugify(value):
     value = unicodedata.normalize('NFD', value)
@@ -18,7 +18,7 @@ def slugify(value):
     value = re.sub(r'[^a-zA-Z0-9]+', '-', value)
     return value.strip('-')
 
-# Function to Search TMDB
+# Function to Search in TMDB
 def search_tmdb_for_suggestions(search_request):
     tmdb_url = f'https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={search_request}'
     try:
@@ -39,7 +39,7 @@ def search_tmdb_for_suggestions(search_request):
 def index():
     return render_template('index.html')
 
-# Results endpoint with caching
+# Results endpoint
 @cache.cached(timeout=300, query_string=True)
 @app.route('/results/<search_request>')
 def results(search_request):    
@@ -47,7 +47,7 @@ def results(search_request):
     results = []
 
     try:
-        # Search OMDB first
+        # Search in OMDB
         search_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={search_request}'
         search_response = requests.get(search_url)
         search_response.raise_for_status()
@@ -70,7 +70,7 @@ def results(search_request):
             tmdb_suggestions = search_tmdb_for_suggestions(search_request)
 
             if tmdb_suggestions:
-                # Use the first suggestion to query OMDB again
+                # Query OMDB again with tmdb suggestions
                 corrected_search = tmdb_suggestions[0]
                 corrected_search_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&s={corrected_search}'
                 corrected_search_response = requests.get(corrected_search_url)
@@ -96,7 +96,7 @@ def results(search_request):
 
     return render_template('index.html', error=error_message)
 
-# Watch endpoint with caching for details
+# Watch endpoint
 @cache.cached(timeout=300, query_string=True)
 @app.route('/watch/<title>')
 def watch(title):
@@ -110,16 +110,15 @@ def watch(title):
     except requests.exceptions.RequestException as e:
         return render_template('watch.html', error_message=str(e))
 
+    # Details about the show
     imdb_id = details_data.get('imdbID')
-    type = details_data.get('Type', "N/A")
-    title = details_data.get('Title', "N/A")
-    plot = details_data.get('Plot', "N/A")
-    plot = '<br>'.join(plot[i:i + 223] for i in range(0, len(plot), 225))
-
-    season = int(request.args.get('season', 1))
+    type    = details_data.get('Type', "N/A")
+    title   = details_data.get('Title', "N/A")
+    plot    = details_data.get('Plot', "N/A")
+    season  = int(request.args.get('season', 1))
     episode = int(request.args.get('episode', 1))
 
-    # Gather season/episode data for series
+    # All episodes of the show
     if type == 'series':
         embed_url = f'https://vidsrc.xyz/embed/tv/{imdb_id}/{season}-{episode}?ads=false'
         total_seasons = int(details_data.get('totalSeasons', 0))
