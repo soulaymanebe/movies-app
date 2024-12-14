@@ -42,7 +42,7 @@ def index():
 # Results endpoint
 @cache.cached(timeout=300, query_string=True)
 @app.route('/results/<search_request>')
-def results(search_request):    
+def results(search_request):
     error_message = None
     results = []
 
@@ -102,7 +102,7 @@ def results(search_request):
 def watch(title):
     title = title.replace('-', ' ')
     details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&t={title}'
-    
+
     try:
         details_response = requests.get(details_url)
         details_response.raise_for_status()
