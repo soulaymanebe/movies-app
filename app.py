@@ -137,7 +137,7 @@ def watch(title):
         seasons_object = None
         total_seasons = None
 
-    return render_template('watch.html', embed_url=embed_url, title=title, plot=plot, type=type, seasons_object=seasons_object, current_episode=episode, current_season=season, total_seasons=total_seasons)
+    return render_template('watch.html', embed_url=embed_url, title=title, plot=plot, type=type, seasons_object=seasons_object, current_episode=episode, current_season=season, total_seasons=total_seasons, imdb_id=imdb_id)
 
 # 404 error handler
 @app.errorhandler(404)
