@@ -101,7 +101,11 @@ def results(search_request):
 @app.route('/watch/<title>')
 def watch(title):
     title = title.replace('-', ' ')
-    details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&t={title}'
+    imdb_id = request.args.get('id')
+    season  = int(request.args.get('season', 1))
+    episode = int(request.args.get('episode', 1))
+
+    details_url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
 
     try:
         details_response = requests.get(details_url)
@@ -111,12 +115,9 @@ def watch(title):
         return render_template('watch.html', error_message=str(e))
 
     # Details about the show
-    imdb_id = details_data.get('imdbID')
     type    = details_data.get('Type', "N/A")
     title   = details_data.get('Title', "N/A")
     plot    = details_data.get('Plot', "N/A")
-    season  = int(request.args.get('season', 1))
-    episode = int(request.args.get('episode', 1))
 
     # All episodes of the show
     if type == 'series':

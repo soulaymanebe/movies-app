@@ -17,9 +17,9 @@
         <div class="results-grid">
             {% for result in results %}
                 {% if result['Type'] == 'series' %}
-                    {% set watch_url = url_for('watch', title=result['Title']|slugify, season=1, episode=1) %}
+                    {% set watch_url = url_for('watch', title=result['Title']|slugify, id=result['imdbID'], season=1, episode=1) %}
                 {% else %}
-                    {% set watch_url = url_for('watch', title=result['Title']|slugify) %}
+                    {% set watch_url = url_for('watch', title=result['Title']|slugify, id=result['imdbID']) %}
                 {% endif %}
                 <a href="{{ watch_url }}" class="result-card">
                     <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='images/black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
