@@ -24,7 +24,7 @@
                             <ul>
                                 {% for episode in episodes %}
                                     <li id="episode-{{ season.split(' ')[1] }}-{{ episode.episode }}" class="{{ 'selected' if episode.episode == current_episode else '' }}">
-                                        <a href="{{ url_for('watch', title=title.replace(' ', '-'), season=season.split(' ')[1], id=imdb_id, episode=episode.episode) }}">
+                                        <a href="{{ url_for('watch', title=title.replace(' ', '-'), id=imdb_id, season=season.split(' ')[1], episode=episode.episode) }}">
                                             Episode {{ episode.episode }}
                                         </a>
                                     </li>
