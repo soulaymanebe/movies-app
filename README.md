@@ -20,7 +20,7 @@ Before you get started, ensure you have the following:
 
    ```bash
    git clone https://github.com/soulaymanebe/movies-app
-   cd movie-streamer
+   cd movies-app
     ```
 
 2. **Install dependencies**:
@@ -39,7 +39,7 @@ Before you get started, ensure you have the following:
 **Once you've set up everything, you can launch the app by running**
 
 ```bash
-python app.py
+gunicorn app:app --bind 0.0.0.0:5000
 ```
 
 ### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
