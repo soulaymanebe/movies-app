@@ -43,3 +43,15 @@ python app.py
 ```
 
 ### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
+
+### Using Docker
+
+1. **Build the Docker Image:**
+    ```sh
+    docker build -t tmenyik .
+    ```
+
+2. **Run the Docker Container:**
+    ```sh
+    docker run -it tmenyik
+    ```
