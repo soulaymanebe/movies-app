@@ -57,7 +57,7 @@ def watch(title):
     infos = Helper.omdb_details([{"imdbID": imdb_id}])[0]
     if not infos:
         return render_template('watch.html', error_message="Failed to load movie details")
-
+    
     content_type = infos.get('Type', "N/A")
     title = infos.get('Title', "N/A")
     plot = infos.get('Plot', "N/A")

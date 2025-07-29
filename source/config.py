@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 
 # Other domains
@@ -14,16 +15,26 @@ VIDSRC_DOMAINS = [
 class Config:
     @staticmethod
     def working_vidsrc_url(content_type, imdb_id, season=None, episode=None):
-        for domain in VIDSRC_DOMAINS:
+        def build_url(domain):
+            if content_type == 'series':
+                return f"https://{domain}/embed/tv/{imdb_id}/{season}-{episode}?ads=false"
+            else:
+                return f"https://{domain}/embed/movie/{imdb_id}?ads=false"
+
+        def check_domain(domain):
+            url = build_url(domain)
             try:
-                if content_type == 'series':
-                    url = f"https://{domain}/embed/tv/{imdb_id}/{season}-{episode}?ads=false"
-                else:
-                    url = f"https://{domain}/embed/movie/{imdb_id}?ads=false"
-                
-                response = requests.get(url, timeout=5)
-                if response.status_code == 200:
+                resp = requests.get(url, timeout=3)
+                if resp.status_code == 200:
                     return url
             except requests.exceptions.RequestException:
-                continue
+                return None
+            return None
+
+        with ThreadPoolExecutor(max_workers=len(VIDSRC_DOMAINS)) as executor:
+            futures = {executor.submit(check_domain, domain): domain for domain in VIDSRC_DOMAINS}
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    return result
         return None

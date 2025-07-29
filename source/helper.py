@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
@@ -37,31 +38,38 @@ class Helper:
 
     @staticmethod
     def omdb_details(imdb_data):
-        results = []
         imdb_ids = [item["imdbID"] for item in imdb_data if "imdbID" in item]
-        
-        for imdb_id in imdb_ids:
+
+        def fetch_details(imdb_id):
             url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}'
             try:
-                resp = requests.get(url, timeout=10)
+                resp = requests.get(url, timeout=5)
                 resp.raise_for_status()
-                results.append(resp.json())
-            except requests.exceptions.RequestException as e:
-                print(f"Failed fetching details for {imdb_id}: {e}")
-                continue
-        
+                return resp.json()
+            except requests.exceptions.RequestException:
+                return None
+
+        results = []
+        with ThreadPoolExecutor(max_workers=10) as executor:  # 10 parallel requests
+            for result in executor.map(fetch_details, imdb_ids):
+                if result:
+                    results.append(result)
         return results
 
     @staticmethod
     def seasons_and_episodes(imdb_id, total_seasons):
-        seasons_object = {}
-        for s in range(1, total_seasons + 1):
+        def fetch_season(s):
             url = f'http://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}&Season={s}'
             try:
-                resp = requests.get(url, timeout=10)
+                resp = requests.get(url, timeout=5)
                 resp.raise_for_status()
                 episodes = resp.json().get('Episodes', [])
-                seasons_object[f'Season {s}'] = [{"title": ep["Title"], "episode": ep["Episode"]} for ep in episodes]
+                return (f'Season {s}', [{"title": ep["Title"], "episode": ep["Episode"]} for ep in episodes])
             except requests.exceptions.RequestException:
-                continue
+                return (f'Season {s}', [])
+        
+        seasons_object = {}
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            for season, episodes in executor.map(fetch_season, range(1, total_seasons + 1)):
+                seasons_object[season] = episodes
         return seasons_object
