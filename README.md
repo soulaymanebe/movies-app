@@ -38,8 +38,21 @@ Before you get started, ensure you have the following:
 
 **Once you've set up everything, you can launch the app by running**
 
+### On Linux
+
 ```bash
-gunicorn app:app --bind 0.0.0.0:5000
+gunicorn source.app:app --bind 0.0.0.0:5000
+```
+
+### On Windows
+
+Install waitress
+```bash
+pip install waitress
+```
+
+```bash
+python -m waitress --host 127.0.0.1 --port 5000 source.app:app
 ```
 
 ### 🌐 **The app will be available at: `http://127.0.0.1:5000`**
