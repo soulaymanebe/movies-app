@@ -3,13 +3,13 @@ import requests
 
 # Other domains
 VIDSRC_DOMAINS = [
-    "vidsrc.xyz",
-    "vidsrc.me",
-    "vidsrc.in",
-    "vidsrc.pm",
-    "vidsrc.net",
-    "vidsrc.io",
-    "vidsrc.vc"
+    "vidsrcme.ru",
+    "vidsrcme.su",
+    "vidsrc-me.ru",
+    "vidsrc-me.su",
+    "vidsrc-embed.ru",
+    "vidsrc-embed.su",
+    "vsrc.su"
 ]
 
 class Config:
