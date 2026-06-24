@@ -3,18 +3,29 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>Search Results</title>
+    <title>Results &middot; {{ search_request|replace('-', ' ')|capitalize }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
 </head>
 <body>
-    <div class="container">
-        <a href="{{ url_for('index') }}" class="home-button">
-            <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="Home" />
+    <div class="beam beam-soft" aria-hidden="true"></div>
+    <header class="topbar">
+        <a href="{{ url_for('index') }}" class="brand brand-sm">
+            <img class="brand-mark" src="{{ url_for('static', filename='images/app-logo.png') }}" alt="">
+            <span class="brand-name">Tmenyik</span>
         </a>
-        <div class="title">
-            <h2>Results for {{ search_request|replace('-', ' ')|capitalize }}</h2>
+        <a href="{{ url_for('index') }}" class="home-button" aria-label="Home">
+            <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="" />
+        </a>
+    </header>
+    <main class="results-page">
+        <div class="results-head">
+            <p class="eyebrow">Search results</p>
+            <h1 class="results-title">{{ search_request|replace('-', ' ')|capitalize }}</h1>
         </div>
+        {% if results %}
         <div class="results-grid">
             {% for result in results %}
                 {% if result['Type'] == 'series' %}
@@ -22,21 +33,44 @@
                 {% else %}
                     {% set watch_url = url_for('watch', title=result['Title']|slugify, id=result['imdbID']) %}
                 {% endif %}
+                {% set has_poster = result['Poster'] and result['Poster'] != 'N/A' %}
                 <a href="{{ watch_url }}" class="result-card">
-                    <img src="{{ result['Poster'] if result['Poster'] != 'N/A' else url_for('static', filename='images/black-poster.jpg') }}" alt="Poster of {{ result['Title'] }}">
-                    <div class="result-info">
-                        <h2>{{ result['Title'] }}</h2>
-                        <p>{{ result['Type'] | replace('series', 'Serie') | capitalize | default('N/A') }} | {{ result['Year'] | default('N/A') }}</p>
-                        <p><strong>Rating:</strong> {{ result['imdbRating'] | default('N/A') }}</p>
-                        {% if result['Type'] == 'series' %}
-                            <p><strong>Seasons:</strong> {{ result['totalSeasons'] | default('N/A') }}</p>
-                        {% else %}
-                            <p><strong>Length:</strong> {{ result['Runtime'] | default('N/A') }}</p>
+                    <div class="poster-wrap">
+                        <div class="poster-fallback pf-c{{ loop.index0 % 6 }}" aria-hidden="true">
+                            <span class="pf-icon">&#127902;</span>
+                            <span class="pf-title">{{ result['Title'] }}</span>
+                        </div>
+                        {% if has_poster %}
+                            <img src="{{ result['Poster'] }}" alt="" loading="lazy" onerror="this.remove();">
                         {% endif %}
+                        <div class="poster-scrim"></div>
+                        <span class="badge badge-type">{{ result['Type'] | replace('series', 'Serie') | capitalize | default('N/A') }}</span>
+                        {% if result['imdbRating'] and result['imdbRating'] != 'N/A' %}
+                            <span class="badge badge-rating"><span class="star">&#9733;</span>{{ result['imdbRating'] }}</span>
+                        {% endif %}
+                        <span class="play-hint" aria-hidden="true">&#9654;</span>
+                    </div>
+                    <div class="result-info">
+                        <h2 title="{{ result['Title'] }}">{{ result['Title'] }}</h2>
+                        <p class="meta">
+                            <span>{{ result['Year'] | default('N/A') }}</span>
+                            {% if result['Type'] == 'series' %}
+                                <span class="dot"></span><span>{{ result['totalSeasons'] | default('N/A') }} seasons</span>
+                            {% else %}
+                                <span class="dot"></span><span>{{ result['Runtime'] | default('N/A') }}</span>
+                            {% endif %}
+                        </p>
                     </div>
                 </a>
             {% endfor %}
         </div>
-    </div>
+        {% else %}
+        <div class="empty-state">
+            <p class="empty-emoji">&#127916;</p>
+            <p>Nothing matched that search. Try another title.</p>
+            <a href="{{ url_for('index') }}" class="btn-ghost">New search</a>
+        </div>
+        {% endif %}
+    </main>
 </body>
 </html>
