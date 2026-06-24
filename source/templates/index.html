@@ -4,39 +4,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Tmenyik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
     <script>
+        const RECENTS_KEY = 'tmenyik:recent-searches';
+        const RECENTS_MAX = 8;
+
         function slugify(value) {
             value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
             value = value.replace(/[^a-zA-Z0-9]+/g, '-');
             return value.replace(/^-+|-+$/g, '');
         }
-        
+
+        function getRecents() {
+            try { return JSON.parse(localStorage.getItem(RECENTS_KEY)) || []; }
+            catch (e) { return []; }
+        }
+        function saveRecents(list) {
+            try { localStorage.setItem(RECENTS_KEY, JSON.stringify(list)); } catch (e) {}
+        }
+        function addRecent(query) {
+            const q = query.trim();
+            if (!q) return;
+            let list = getRecents().filter(item => item.toLowerCase() !== q.toLowerCase());
+            list.unshift(q);
+            saveRecents(list.slice(0, RECENTS_MAX));
+        }
+        function removeRecent(query) {
+            saveRecents(getRecents().filter(item => item !== query));
+            renderRecents(document.querySelector('input[name="movieName"]').value);
+        }
+        function clearRecents() {
+            saveRecents([]);
+            renderRecents();
+        }
+
+        function goToSearch(query) {
+            const slug = slugify(query);
+            if (!slug) return;
+            addRecent(query);
+            window.location.href = `/results/${slug}`;
+        }
+
         function searchMovie(event) {
             event.preventDefault();
-            const movieName = document.querySelector('input[name="movieName"]').value;
-            const searchRequest = slugify(movieName);
-            window.location.href = `/results/${searchRequest}`;
+            goToSearch(document.querySelector('input[name="movieName"]').value);
         }
+
+        function renderRecents(filter) {
+            const box = document.getElementById('recents');
+            let list = getRecents();
+            if (filter) {
+                const f = filter.trim().toLowerCase();
+                list = list.filter(q => q.toLowerCase().includes(f));
+            }
+            box.innerHTML = '';
+            if (!list.length) { box.hidden = true; return; }
+
+            const head = document.createElement('div');
+            head.className = 'recents-head';
+            const label = document.createElement('span');
+            label.textContent = 'Recent searches';
+            const clear = document.createElement('button');
+            clear.type = 'button';
+            clear.className = 'recents-clear';
+            clear.textContent = 'Clear';
+            clear.addEventListener('mousedown', e => { e.preventDefault(); clearRecents(); });
+            head.append(label, clear);
+            box.appendChild(head);
+
+            list.forEach(q => {
+                const row = document.createElement('div');
+                row.className = 'recent-item';
+
+                const go = document.createElement('button');
+                go.type = 'button';
+                go.className = 'recent-go';
+                go.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+                const txt = document.createElement('span');
+                txt.textContent = q;
+                go.appendChild(txt);
+                go.addEventListener('mousedown', e => { e.preventDefault(); goToSearch(q); });
+
+                const del = document.createElement('button');
+                del.type = 'button';
+                del.className = 'recent-del';
+                del.setAttribute('aria-label', 'Remove ' + q);
+                del.textContent = '\u00d7';
+                del.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); removeRecent(q); });
+
+                row.append(go, del);
+                box.appendChild(row);
+            });
+            box.hidden = false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.querySelector('input[name="movieName"]');
+            const box = document.getElementById('recents');
+            input.addEventListener('focus', () => renderRecents(input.value));
+            input.addEventListener('input', () => renderRecents(input.value));
+            input.addEventListener('blur', () => { setTimeout(() => { box.hidden = true; }, 120); });
+            if (document.activeElement === input) renderRecents(input.value);
+        });
     </script>
 </head>
-<body>
-    <div class="container">
-        <a href="{{ url_for('index') }}" class="home-button">
-            <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="Home" />
+<body class="page-landing">
+    <div class="beam" aria-hidden="true"></div>
+    <main class="landing">
+        <a href="{{ url_for('index') }}" class="brand">
+            <img class="brand-mark" src="{{ url_for('static', filename='images/app-logo.png') }}" alt="">
+            <span class="brand-name">Tmenyik</span>
         </a>
-        <div class="title">
-            <h2>Tmenyik</h2>
-            <h1>Find Your Favorite Movie & Serie</h1>
-        </div>
+        <h1 class="hero-title">What are we<br>watching tonight?</h1>
+        <p class="hero-sub">Search thousands of movies and series, then press play.</p>
         {% if error %}
-            <p class="error">{{ error }}</p>
+            <p class="error" role="alert">{{ error }}</p>
         {% endif %}
         <form class="search-form" onsubmit="searchMovie(event)">
-            <input type="text" name="movieName" placeholder="Enter movie or series name..." required>
-            <button type="submit">Search</button>
+            <div class="search-wrap">
+                <div class="search-field">
+                    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M21 21l-4.3-4.3M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+                    </svg>
+                    <input type="text" name="movieName" placeholder="Try &ldquo;Interstellar&rdquo; or &ldquo;One Piece&rdquo;&hellip;" required autocomplete="off" autofocus>
+                    <button type="submit">Search</button>
+                </div>
+                <div class="recents" id="recents" hidden></div>
+            </div>
         </form>
-    </div>
+    </main>
 </body>
 </html>

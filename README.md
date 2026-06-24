@@ -17,20 +17,20 @@ Before you get started, ensure you have the following:
 ### ⚙️ **Setup**
 
 1. **Clone the repository**:
-
-   ```bash
-   git clone https://github.com/soulaymanebe/movies-app
-   cd movies-app
-    ```
-
-2. **Install dependencies**:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3. **Prepare the `.env` file**:
+2. **Create a virtual env**:
+3. **Install dependencies**:
+4. **Prepare the `.env` file**:
     Create a .env file in the root directory and add your OMDB API key, check `.env-example` file for instructions
+5. **Export .env vars**
+
+```
+git clone https://github.com/soulaymanebe/movies-app
+cd movies-app
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export $(grep -v '^#' .env | xargs)
+```
 
 ---
 
@@ -41,6 +41,7 @@ Before you get started, ensure you have the following:
 ### On Linux
 
 ```bash
+flask --app source.app run --debug # Debug mode
 gunicorn source.app:app --bind 0.0.0.0:5000
 ```
 

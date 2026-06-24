@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>404 &middot; Page not found</title>
+    <title>500 &middot; Something went wrong</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -15,9 +15,9 @@
         <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="" />
     </a>
     <div class="error-container">
-        <p class="error-title">404</p>
-        <p class="error-message">We couldn&rsquo;t find that page. It may have moved, or never existed.</p>
-        <p class="error-emoji">&#127902;</p>
+        <p class="error-title">500</p>
+        <p class="error-message">Something broke on our end. Give it a moment and try again.</p>
+        <p class="error-emoji">&#128296;</p>
         <a href="{{ url_for('index') }}" class="btn-ghost">Back to search</a>
     </div>
 </body>

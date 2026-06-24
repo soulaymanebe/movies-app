@@ -3,60 +3,80 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>Watching {{ title }}</title>
+    <title>{{ title }} &middot; Tmenyik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
 </head>
 <body>
-    <a href="{{ url_for('index') }}" class="home-button">
-        <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="Home" />
-    </a>
-    <div class="parent-container">
+    <div class="beam beam-soft" aria-hidden="true"></div>
+    <header class="topbar">
+        <a href="{{ url_for('index') }}" class="brand brand-sm">
+            <img class="brand-mark" src="{{ url_for('static', filename='images/app-logo.png') }}" alt="">
+            <span class="brand-name">Tmenyik</span>
+        </a>
+        <a href="{{ url_for('index') }}" class="home-button" aria-label="Home">
+            <img src="{{ url_for('static', filename='images/home-icon.png') }}" alt="" />
+        </a>
+    </header>
+    {% set has_sidebar = (type == 'series' and seasons_object) %}
+    <div class="parent-container{% if not has_sidebar %} no-sidebar{% endif %}">
+        {% if has_sidebar %}
         <div class="left-container">
             <!-- All seasons & episodes -->
-            {% if type == 'series' and seasons_object %}
-                <div class="seasons-container">
-                    <h2>All Episodes</h2>
-                    {% for season, episodes in seasons_object.items() %}
-                        <div class="season-button" onclick="toggleEpisodes('{{ season }}')">
-                            {{ season }}
-                        </div>
-                        <div id="{{ season }}" class="episode-list">
-                            <ul>
-                                {% for episode in episodes %}
-                                    <li id="episode-{{ season.split(' ')[1] }}-{{ episode.episode }}" class="{{ 'selected' if episode.episode == current_episode else '' }}">
-                                        <a href="{{ url_for('watch', title=title.replace(' ', '-'), id=imdb_id, season=season.split(' ')[1], episode=episode.episode) }}">
-                                            Episode {{ episode.episode }}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+            <div class="seasons-container">
+                <h2>Episodes</h2>
+                {% for season, episodes in seasons_object.items() %}
+                    <button type="button" class="season-button" onclick="toggleEpisodes('{{ season }}')">
+                        <span>{{ season }}</span>
+                        <span class="chev" aria-hidden="true">&#8964;</span>
+                    </button>
+                    <div id="{{ season }}" class="episode-list">
+                        <ul>
+                            {% for episode in episodes %}
+                                <li id="episode-{{ season.split(' ')[1] }}-{{ episode.episode }}" class="{{ 'selected' if episode.episode == current_episode else '' }}">
+                                    <a href="{{ url_for('watch', title=title.replace(' ', '-'), id=imdb_id, season=season.split(' ')[1], episode=episode.episode) }}">
+                                        <span class="ep-num">E{{ episode.episode }}</span>
+                                        <span class="ep-title">{{ episode.title }}</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
+        {% endif %}
         <!-- Movie/serie -->
         <div class="watch-container">
             <div class="title">
                 <h2>{{ title }}</h2>
             </div>
             <div class="video-container">
-                <!-- Loading message -->
-                <div class="loading" id="loading" style="display: none;">Loading video...</div>
+                <!-- Loading: visible by default, hidden once the iframe loads -->
+                <div class="loading" id="loading">
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span>Loading video&hellip;</span>
+                </div>
                 {% if embed_url %}
-                    <iframe src="{{ embed_url }}" frameborder="0" allowfullscreen onload="document.getElementById('loading').style.display='none';"></iframe>
+                    <iframe src="{{ embed_url }}"
+                            title="{{ title }} player"
+                            referrerpolicy="no-referrer"
+                            allow="encrypted-media; fullscreen; picture-in-picture"
+                            allowfullscreen
+                            onload="document.getElementById('loading').style.display='none';"></iframe>
                 {% else %}
-                    <p>No video available.</p>
+                    <div class="no-video">No video available for this title.</div>
                 {% endif %}
             </div>
             <!-- Story line -->
             <div class="plot-container">
-                <h2>Story Line</h2>
+                <h2>Storyline</h2>
                 {% if error_message %}
                     <div class="error-message">{{ error_message }}</div>
                 {% else %}
-                    <p>{{ plot | safe }}</p>
+                    <p>{{ plot }}</p>
                 {% endif %}
             </div>
         </div>
@@ -66,40 +86,33 @@
             var selectedEpisodes = document.getElementById(seasonId);
 
             if (selectedEpisodes.classList.contains('active')) {
-                // If the selected list is already open, close it and clear saved season from localStorage
                 selectedEpisodes.classList.remove('active');
                 localStorage.removeItem('activeSeason');
             } else {
-                // Close other lists
-                var allEpisodes = document.querySelectorAll('.episode-list');
-                allEpisodes.forEach(function (el) {
+                document.querySelectorAll('.episode-list').forEach(function (el) {
                     el.classList.remove('active');
                 });
-
-                // Open the selected list and save the season ID to localStorage
                 selectedEpisodes.classList.add('active');
                 localStorage.setItem('activeSeason', seasonId);
             }
         }
 
-        // On page load, check if there is an active season in localStorage
         document.addEventListener('DOMContentLoaded', function () {
             var activeSeason = localStorage.getItem('activeSeason');
             if (activeSeason) {
-                var selectedEpisodes = document.getElementById(activeSeason);
-                if (selectedEpisodes) {
-                    selectedEpisodes.classList.add('active');
-                }
+                var el = document.getElementById(activeSeason);
+                if (el) el.classList.add('active');
             }
 
-            // Highlight the current episode based on URL
             var urlParams = new URLSearchParams(window.location.search);
             var currentSeason = urlParams.get('season');
             var currentEpisode = urlParams.get('episode');
             if (currentSeason && currentEpisode) {
-                var currentEpisodeElement = document.getElementById(`episode-${currentSeason}-${currentEpisode}`);
-                if (currentEpisodeElement) {
-                    currentEpisodeElement.classList.add('selected');
+                var cur = document.getElementById(`episode-${currentSeason}-${currentEpisode}`);
+                if (cur) {
+                    cur.classList.add('selected');
+                    var parentList = cur.closest('.episode-list');
+                    if (parentList) parentList.classList.add('active');
                 }
             }
         });
