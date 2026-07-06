@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ url_for('static', filename='images/app-logo.svg') }}" type="image/svg+xml">
 </head>
 <body>
     <div class="beam beam-soft" aria-hidden="true"></div>
@@ -24,7 +24,6 @@
     <div class="parent-container{% if not has_sidebar %} no-sidebar{% endif %}">
         {% if has_sidebar %}
         <div class="left-container">
-            <!-- All seasons & episodes -->
             <div class="seasons-container">
                 <h2>Episodes</h2>
                 {% for season, episodes in seasons_object.items() %}
@@ -48,29 +47,52 @@
             </div>
         </div>
         {% endif %}
-        <!-- Movie/serie -->
         <div class="watch-container">
             <div class="title">
                 <h2>{{ title }}</h2>
             </div>
             <div class="video-container">
-                <!-- Loading: visible by default, hidden once the iframe loads -->
                 <div class="loading" id="loading">
                     <span class="spinner" aria-hidden="true"></span>
                     <span>Loading video&hellip;</span>
                 </div>
                 {% if embed_url %}
-                    <iframe src="{{ embed_url }}"
+                    <iframe id="player"
+                            src="{{ embed_url }}"
                             title="{{ title }} player"
                             referrerpolicy="no-referrer"
                             allow="encrypted-media; fullscreen; picture-in-picture"
                             allowfullscreen
                             onload="document.getElementById('loading').style.display='none';"></iframe>
+                {% elif error_message %}
+                    <div class="no-video">{{ error_message }}</div>
                 {% else %}
                     <div class="no-video">No video available for this title.</div>
                 {% endif %}
             </div>
-            <!-- Story line -->
+
+            <!-- {% if next_url %}
+            <div class="upnext-card" id="upnext" hidden>
+                <div class="upnext-info">
+                    <span class="upnext-label">Up next</span>
+                    <span class="upnext-ep">Season {{ next_season }} &middot; Episode {{ next_episode }}</span>
+                </div>
+                <div class="upnext-actions">
+                    <button type="button" class="btn-ghost-sm" id="upnextCancel">Cancel</button>
+                    <a href="{{ next_url }}" class="btn-coral-sm">Play now <span id="upnextCount"></span></a>
+                </div>
+            </div>
+            {% endif %} -->
+
+            {% if prev_url or next_url %}
+            <div class="player-bar">
+                <div class="ep-nav">
+                    {% if prev_url %}<a href="{{ prev_url }}" class="ep-nav-btn">&#8249; Prev</a>{% endif %}
+                    {% if next_url %}<a href="{{ next_url }}" class="ep-nav-btn primary">Next &#8250;</a>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             <div class="plot-container">
                 <h2>Storyline</h2>
                 {% if error_message %}
@@ -81,10 +103,30 @@
             </div>
         </div>
     </div>
+
+    <div id="watch-data"
+         data-id="{{ imdb_id or '' }}"
+         data-title="{{ title or '' }}"
+         data-type="{{ type or '' }}"
+         data-poster="{{ poster or '' }}"
+         data-season="{{ current_season or '' }}"
+         data-episode="{{ current_episode or '' }}"
+         data-next="{{ next_url or '' }}"
+         data-runtime="{{ runtime_minutes|default(0)|int }}"
+         hidden></div>
+
     <script>
+        (function () {
+            var d = document.getElementById('watch-data').dataset;
+            window.__WATCH__ = {
+                id: d.id, title: d.title, type: d.type, poster: d.poster,
+                season: d.season, episode: d.episode
+            };
+        })();
+
+        // ---- Seasons accordion ----
         function toggleEpisodes(seasonId) {
             var selectedEpisodes = document.getElementById(seasonId);
-
             if (selectedEpisodes.classList.contains('active')) {
                 selectedEpisodes.classList.remove('active');
                 localStorage.removeItem('activeSeason');
@@ -97,24 +139,41 @@
             }
         }
 
+        // ---- Continue watching: remember the title/episode you last opened ----
+        function recordContinue() {
+            var w = window.__WATCH__;
+            if (!w || !w.id) return;
+            var list = [];
+            try { list = JSON.parse(localStorage.getItem('tmenyik:continue')) || []; } catch (e) {}
+            list = list.filter(function (it) { return it.id !== w.id; });
+            list.unshift({
+                id: w.id, title: w.title, type: w.type, poster: w.poster,
+                season: w.season, episode: w.episode,
+                url: window.location.pathname + window.location.search,
+                ts: Date.now()
+            });
+            try { localStorage.setItem('tmenyik:continue', JSON.stringify(list.slice(0, 12))); } catch (e) {}
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            // restore open season + highlight current episode
             var activeSeason = localStorage.getItem('activeSeason');
             if (activeSeason) {
                 var el = document.getElementById(activeSeason);
                 if (el) el.classList.add('active');
             }
-
-            var urlParams = new URLSearchParams(window.location.search);
-            var currentSeason = urlParams.get('season');
-            var currentEpisode = urlParams.get('episode');
-            if (currentSeason && currentEpisode) {
-                var cur = document.getElementById(`episode-${currentSeason}-${currentEpisode}`);
+            var params = new URLSearchParams(window.location.search);
+            var cs = params.get('season'), ce = params.get('episode');
+            if (cs && ce) {
+                var cur = document.getElementById('episode-' + cs + '-' + ce);
                 if (cur) {
                     cur.classList.add('selected');
-                    var parentList = cur.closest('.episode-list');
-                    if (parentList) parentList.classList.add('active');
+                    var pl = cur.closest('.episode-list');
+                    if (pl) pl.classList.add('active');
                 }
             }
+
+            recordContinue();
         });
     </script>
 </body>

@@ -17,6 +17,9 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 OMDB_URL = "https://www.omdbapi.com/"
 TMDB_SEARCH_URL = "https://api.themoviedb.org/3/search/multi"
 
+SEARCH_TIMEOUT = (3.05, 8)
+DETAIL_TIMEOUT = (3.05, 5)
+
 if not OMDB_API_KEY:
     logger.warning("OMDB_API_KEY is not set — OMDB requests will fail.")
 if not TMDB_API_KEY:
@@ -26,7 +29,9 @@ if not TMDB_API_KEY:
 def _build_session(pool_size=10):
     session = requests.Session()
     retry = Retry(
-        total=2,
+        total=1,
+        connect=0,
+        read=1,
         backoff_factor=0.3,
         status_forcelist=(429, 500, 502, 503, 504),
         allowed_methods=("GET", "HEAD"),
@@ -43,6 +48,7 @@ def _build_session(pool_size=10):
 
 SESSION = _build_session()
 
+
 class Helper:
     @staticmethod
     def search_tmdb(search_request):
@@ -52,7 +58,7 @@ class Helper:
             resp = SESSION.get(
                 TMDB_SEARCH_URL,
                 params={"api_key": TMDB_API_KEY, "query": search_request},
-                timeout=10,
+                timeout=SEARCH_TIMEOUT,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -76,7 +82,7 @@ class Helper:
             resp = SESSION.get(
                 OMDB_URL,
                 params={"apikey": OMDB_API_KEY, "s": search_term},
-                timeout=10,
+                timeout=SEARCH_TIMEOUT,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -96,7 +102,7 @@ class Helper:
                 resp = SESSION.get(
                     OMDB_URL,
                     params={"apikey": OMDB_API_KEY, "i": imdb_id},
-                    timeout=5,
+                    timeout=DETAIL_TIMEOUT,
                 )
                 resp.raise_for_status()
                 return resp.json()
@@ -121,7 +127,7 @@ class Helper:
                 resp = SESSION.get(
                     OMDB_URL,
                     params={"apikey": OMDB_API_KEY, "i": imdb_id, "Season": season_num},
-                    timeout=5,
+                    timeout=DETAIL_TIMEOUT,
                 )
                 resp.raise_for_status()
                 episodes = resp.json().get("Episodes", []) or []
@@ -146,3 +152,55 @@ class Helper:
             ):
                 seasons_object[f"Season {season_num}"] = episodes
         return seasons_object
+
+    @staticmethod
+    def episode_neighbors(seasons_object, current_season, current_episode):
+        if not seasons_object:
+            return (None, None)
+
+        flat = []
+        for season_key, episodes in seasons_object.items():
+            parts = season_key.split(" ")
+            snum = parts[1] if len(parts) > 1 else season_key
+            for ep in episodes:
+                flat.append((str(snum), str(ep.get("episode", ""))))
+
+        cur = (str(current_season), str(current_episode))
+        try:
+            i = flat.index(cur)
+        except ValueError:
+            return (None, None)
+
+        prev = flat[i - 1] if i > 0 else None
+        nxt = flat[i + 1] if i < len(flat) - 1 else None
+        return (prev, nxt)
+
+    @staticmethod
+    def first_episode(seasons_object):
+        print(seasons_object)
+        if not seasons_object:
+            return (1, 1)
+
+        def season_num(key):
+            parts = key.split(" ")
+            return int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 9999
+
+        first_key = min(seasons_object.keys(), key=season_num)
+        s = season_num(first_key)
+        if s == 9999:  # unparseable season label — safe fallback
+            return (1, 1)
+
+        episodes = seasons_object.get(first_key) or []
+        if not episodes:
+            return (s, 1)
+
+        def ep_value(ep):
+            e = str(ep.get("episode", ""))
+            return int(e) if e.isdigit() else None
+
+        real = [n for n in (ep_value(ep) for ep in episodes) if n is not None and n >= 1]
+        if real:
+            return (s, min(real))
+
+        any_num = [n for n in (ep_value(ep) for ep in episodes) if n is not None]
+        return (s, min(any_num) if any_num else 1)

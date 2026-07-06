@@ -86,8 +86,8 @@ a { color: inherit; }
     width: 38px;
     height: 38px;
     border-radius: 11px;
-    object-fit: cover;
-    box-shadow: 0 0 0 1px var(--line-strong), 0 8px 20px -8px var(--glow);
+    object-fit: contain;
+    /* box-shadow: 0 0 0 1px var(--line-strong), 0 8px 20px -8px var(--glow); */
 }
 .brand-name {
     font-family: var(--font-display);
@@ -617,8 +617,9 @@ a { color: inherit; }
 
 @media (max-width: 520px) {
     .results-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-    .search-field { flex-wrap: wrap; border-radius: 22px; }
-    .search-field button { width: 100%; }
+    .search-field button { padding: 13px 18px; }
+    /* .search-field { flex-wrap: wrap; border-radius: 22px; }
+    .search-field button { width: 100%; } */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -869,3 +870,191 @@ a { color: inherit; }
 /* ---------- Movie watch page (no episode sidebar) → centre the player ---------- */
 .parent-container.no-sidebar { justify-content: center; }
 .parent-container.no-sidebar .watch-container { max-width: 1024px; }
+
+/* ---------- Player bar (language, episode nav, auto-play) ---------- */
+.player-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+}
+.lang-controls { display: flex; align-items: center; gap: 6px; }
+.pb-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+}
+.lang-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--paper);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 11px;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.lang-btn:hover { background: rgba(255, 99, 71, 0.12); border-color: rgba(255, 99, 71, 0.4); }
+.lang-btn.active { background: var(--coral); border-color: var(--coral); color: var(--ink); }
+
+.ep-nav { display: flex; gap: 8px; margin-left: auto; }
+.ep-nav-btn {
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--paper);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 16px;
+    transition: background 0.18s ease, border-color 0.18s ease;
+}
+.ep-nav-btn:hover { background: rgba(255, 99, 71, 0.12); border-color: rgba(255, 99, 71, 0.4); }
+.ep-nav-btn.primary { background: var(--coral); border-color: var(--coral); color: var(--ink); }
+.ep-nav-btn.primary:hover { background: var(--coral-soft); }
+
+.autoplay-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+}
+.autoplay-toggle input { width: 16px; height: 16px; accent-color: var(--coral); cursor: pointer; }
+
+/* ---------- Up next card ---------- */
+.upnext-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 14px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid rgba(255, 99, 71, 0.4);
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 1px rgba(255, 99, 71, 0.15);
+    animation: rise 0.3s ease both;
+}
+.upnext-info { display: flex; flex-direction: column; gap: 2px; }
+.upnext-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--coral);
+}
+.upnext-ep { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+.upnext-actions { display: flex; gap: 10px; align-items: center; }
+.btn-ghost-sm, .btn-coral-sm {
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.btn-ghost-sm { background: none; border: 1px solid var(--line-strong); color: var(--paper); }
+.btn-ghost-sm:hover { background: rgba(244, 238, 240, 0.06); }
+.btn-coral-sm { background: var(--coral); border: none; color: var(--ink); }
+.btn-coral-sm:hover { background: var(--coral-soft); }
+
+/* ---------- Continue watching (landing) ---------- */
+.continue {
+    width: 100%;
+    max-width: 720px;
+    margin: 36px auto 0;
+    text-align: left;
+}
+.continue-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.continue-head span {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.continue-row {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 99, 71, 0.5) transparent;
+}
+.cw-card {
+    flex: none;
+    width: 120px;
+    text-decoration: none;
+    color: inherit;
+}
+.cw-poster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: linear-gradient(155deg, #221d33, #3a2740);
+    border: 1px solid var(--line);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.cw-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cw-card:hover .cw-poster { transform: translateY(-4px); border-color: rgba(255, 99, 71, 0.5); }
+.cw-tag {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--paper);
+    background: rgba(10, 9, 14, 0.78);
+    border-radius: 6px;
+    padding: 3px 7px;
+}
+.cw-del {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(10, 9, 14, 0.7);
+    color: var(--paper);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.18s ease, background 0.18s ease;
+}
+.cw-card:hover .cw-del { opacity: 1; }
+.cw-del:hover { background: rgba(255, 99, 71, 0.85); }
+.cw-title {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--paper);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+    .player-bar { gap: 10px; }
+    .ep-nav { margin-left: 0; }
+}
