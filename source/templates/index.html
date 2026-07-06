@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ url_for('static', filename='images/app-logo.svg') }}" type="image/svg+xml">
     <script>
         const RECENTS_KEY = 'tmenyik:recent-searches';
         const RECENTS_MAX = 8;
@@ -101,6 +101,62 @@
             box.hidden = false;
         }
 
+        function renderContinue() {
+            const section = document.getElementById('continue');
+            const row = document.getElementById('continueRow');
+            let list = [];
+            try { list = JSON.parse(localStorage.getItem('tmenyik:continue')) || []; } catch (e) {}
+            row.innerHTML = '';
+            if (!list.length) { section.hidden = true; return; }
+
+            list.forEach(it => {
+                const card = document.createElement('a');
+                card.className = 'cw-card';
+                card.href = it.url;
+
+                const wrap = document.createElement('div');
+                wrap.className = 'cw-poster';
+                if (it.poster && it.poster !== 'N/A') {
+                    const img = document.createElement('img');
+                    img.src = it.poster;
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    img.onerror = function () { this.remove(); wrap.classList.add('cw-noimg'); };
+                    wrap.appendChild(img);
+                } else {
+                    wrap.classList.add('cw-noimg');
+                }
+                if (it.type === 'series') {
+                    const tag = document.createElement('span');
+                    tag.className = 'cw-tag';
+                    tag.textContent = 'S' + it.season + ' \u00b7 E' + it.episode;
+                    wrap.appendChild(tag);
+                }
+                const del = document.createElement('button');
+                del.type = 'button';
+                del.className = 'cw-del';
+                del.setAttribute('aria-label', 'Remove');
+                del.textContent = '\u00d7';
+                del.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let l = [];
+                    try { l = JSON.parse(localStorage.getItem('tmenyik:continue')) || []; } catch (er) {}
+                    localStorage.setItem('tmenyik:continue', JSON.stringify(l.filter(x => x.id !== it.id)));
+                    renderContinue();
+                });
+                wrap.appendChild(del);
+
+                const t = document.createElement('span');
+                t.className = 'cw-title';
+                t.textContent = it.title;
+
+                card.append(wrap, t);
+                row.appendChild(card);
+            });
+            section.hidden = false;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const input = document.querySelector('input[name="movieName"]');
             const box = document.getElementById('recents');
@@ -108,6 +164,12 @@
             input.addEventListener('input', () => renderRecents(input.value));
             input.addEventListener('blur', () => { setTimeout(() => { box.hidden = true; }, 120); });
             if (document.activeElement === input) renderRecents(input.value);
+
+            renderContinue();
+            document.getElementById('continueClear').addEventListener('click', function () {
+                localStorage.removeItem('tmenyik:continue');
+                renderContinue();
+            });
         });
     </script>
 </head>
@@ -135,6 +197,14 @@
                 <div class="recents" id="recents" hidden></div>
             </div>
         </form>
+
+        <section class="continue" id="continue" hidden>
+            <div class="continue-head">
+                <span>Continue watching</span>
+                <button type="button" class="recents-clear" id="continueClear">Clear</button>
+            </div>
+            <div class="continue-row" id="continueRow"></div>
+        </section>
     </main>
 </body>
 </html>

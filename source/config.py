@@ -1,6 +1,7 @@
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlencode
 
 import requests
 
@@ -22,15 +23,37 @@ VIDSRC_DOMAINS = [
     if d.strip()
 ]
 
+PLAYER_PARAM_KEYS = {
+    "autoplay": "autoplay",
+    "color": "color",
+    "sub": "sub",
+    "start": "start",
+}
+
 _session = requests.Session()
 
 class Config:
     @staticmethod
-    def working_vidsrc_url(content_type, imdb_id, season=None, episode=None):
+    def working_vidsrc_url(content_type, imdb_id, season=None, episode=None,
+                           autoplay=None, color=None, sub=None, start=None):
+        extra = {}
+        if autoplay is not None:
+            extra[PLAYER_PARAM_KEYS["autoplay"]] = "1" if autoplay else "0"
+        if color:
+            extra[PLAYER_PARAM_KEYS["color"]] = color.lstrip("#")
+        if sub:
+            extra[PLAYER_PARAM_KEYS["sub"]] = sub
+        if start:
+            extra[PLAYER_PARAM_KEYS["start"]] = str(start)
+
         def build_url(domain):
             if content_type == "series":
-                return f"https://{domain}/embed/tv/{imdb_id}/{season}-{episode}?ads=false"
-            return f"https://{domain}/embed/movie/{imdb_id}?ads=false"
+                base = f"https://{domain}/embed/tv/{imdb_id}/{season}-{episode}?ads=false"
+            else:
+                base = f"https://{domain}/embed/movie/{imdb_id}?ads=false"
+            if extra:
+                base += "&" + urlencode(extra)
+            return base
 
         def is_reachable(domain):
             url = build_url(domain)

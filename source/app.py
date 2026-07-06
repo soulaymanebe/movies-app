@@ -3,7 +3,7 @@ import os
 import re
 import unicodedata
 
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, url_for, redirect
 from flask_caching import Cache
 
 from source.config import Config
@@ -80,7 +80,6 @@ def create_app():
             detailed = Helper.omdb_details(items)
             detailed = [d for d in detailed if d.get("Type") in ("movie", "series")]
             if not detailed:
-                # Details all failed (likely network) — don't cache an empty page.
                 return render_template(
                     "index.html",
                     error="Couldn't load details right now. Please try again.",
@@ -91,7 +90,7 @@ def create_app():
                 results=detailed,
                 search_request=search_request,
             )
-            cache.set(cache_key, html, timeout=300)  # cache the good result only
+            cache.set(cache_key, html, timeout=300)
             return html
         except Exception:
             logger.exception("results() failed for %r", search_request)
@@ -106,15 +105,11 @@ def create_app():
         if not imdb_id:
             abort(404)
 
-        season = safe_int(request.args.get("season"), default=1)
-        episode = safe_int(request.args.get("episode"), default=1)
+        raw_season = request.args.get("season")
+        raw_episode = request.args.get("episode")
 
-        # Only successful renders are cached (keyed on id/season/episode), so a
-        # failed metadata load is never stored and won't stick after reconnect.
-        cache_key = f"watch:{imdb_id}:{season}:{episode}"
-        cached = cache.get(cache_key)
-        if cached is not None:
-            return cached
+        season = safe_int(raw_season, default=1)
+        episode = safe_int(raw_episode, default=1, minimum=0)
 
         try:
             details_list = Helper.omdb_details([{"imdbID": imdb_id}])
@@ -126,38 +121,83 @@ def create_app():
         if not infos:
             return render_template(
                 "watch.html",
-                error_message="Failed to load movie details.",
+                title=title.replace("-", " ").title(),
+                error_message="Couldn't load this title right now — check your connection and retry.",
             )
 
         content_type = infos.get("Type", "N/A")
         title = infos.get("Title", "N/A")
-        plot = infos.get("Plot", "N/A")
+        plot = infos.get("Plot", "")
+        poster = infos.get("Poster", "")
+
+        THEME_COLOR = "ff6347"
 
         if content_type == "series":
-            embed_url = Config.working_vidsrc_url("series", imdb_id, season, episode)
             total_seasons = safe_int(infos.get("totalSeasons"), default=0, minimum=0)
             seasons_object = Helper.seasons_and_episodes(imdb_id, total_seasons)
+
+            if raw_season is None or raw_episode is None:
+                first_s, first_e = Helper.first_episode(seasons_object)
+                return redirect(url_for(
+                    "watch",
+                    title=title.replace(" ", "-"),
+                    id=imdb_id,
+                    season=first_s,
+                    episode=first_e,
+                ))
+
+            cache_key = f"watch:{imdb_id}:{season}:{episode}"
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+            embed_url = Config.working_vidsrc_url(
+                "series", imdb_id, season, episode, autoplay=True, color=THEME_COLOR
+            )
+            prev_pair, next_pair = Helper.episode_neighbors(seasons_object, season, episode)
         else:
-            embed_url = Config.working_vidsrc_url("movie", imdb_id)
+            cache_key = f"watch:{imdb_id}:movie"
+            cached = cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+            embed_url = Config.working_vidsrc_url(
+                "movie", imdb_id, autoplay=True, color=THEME_COLOR
+            )
             total_seasons = None
             seasons_object = None
+            prev_pair, next_pair = (None, None)
+
+        def ep_url(pair):
+            if not pair:
+                return None
+            s, e = pair
+            return url_for("watch", title=title.replace(" ", "-"), id=imdb_id, season=s, episode=e)
+
+        runtime_match = re.match(r"(\d+)", infos.get("Runtime", "") or "")
+        runtime_minutes = int(runtime_match.group(1)) if runtime_match else 0
 
         html = render_template(
             "watch.html",
             embed_url=embed_url,
             title=title,
             plot=plot,
+            poster=poster,
             type=content_type,
             seasons_object=seasons_object,
             current_episode=episode,
             current_season=season,
             total_seasons=total_seasons,
             imdb_id=imdb_id,
+            prev_url=ep_url(prev_pair),
+            next_url=ep_url(next_pair),
+            next_season=next_pair[0] if next_pair else None,
+            next_episode=next_pair[1] if next_pair else None,
+            runtime_minutes=runtime_minutes,
         )
         cache.set(cache_key, html, timeout=300)
         return html
 
-    # Lightweight health check
     @app.route("/healthz")
     def healthz():
         return {"status": "ok"}, 200
@@ -178,5 +218,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    # debug is OFF unless explicitly enabled
     app.run(debug=os.getenv("FLASK_DEBUG", "0") == "1")

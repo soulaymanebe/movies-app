@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/app-logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ url_for('static', filename='images/app-logo.svg') }}" type="image/svg+xml">
 </head>
 <body>
     <div class="beam beam-soft" aria-hidden="true"></div>
@@ -28,11 +28,7 @@
         {% if results %}
         <div class="results-grid">
             {% for result in results %}
-                {% if result['Type'] == 'series' %}
-                    {% set watch_url = url_for('watch', title=result['Title']|slugify, id=result['imdbID'], season=1, episode=1) %}
-                {% else %}
-                    {% set watch_url = url_for('watch', title=result['Title']|slugify, id=result['imdbID']) %}
-                {% endif %}
+                {% set watch_url = url_for('watch', title=result['Title']|slugify, id=result['imdbID']) %}
                 {% set has_poster = result['Poster'] and result['Poster'] != 'N/A' %}
                 <a href="{{ watch_url }}" class="result-card">
                     <div class="poster-wrap">
